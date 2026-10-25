@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TrustVault — Secure Document Sharing</title>
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #172033;
+      background: #f4f7fb;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header {
+      background: #111d35;
+      color: white;
+      padding: 22px max(20px, calc((100% - 1080px) / 2));
+    }
+    header h1 { margin: 0; font-size: 25px; }
+    header p { margin: 7px 0 0; color: #c4cee0; }
+    main { max-width: 1080px; margin: 26px auto; padding: 0 18px 40px; }
+    .toolbar, .panel, .stat {
+      background: white;
+      border: 1px solid #e1e7f0;
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    select, input, button {
+      font: inherit;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+    }
+    button {
+      cursor: pointer;
+      background: #2457d6;
+      color: white;
+      border: 1px solid #2457d6;
+      font-weight: 600;
+    }
+    button.secondary {
+      background: white;
+      color: #23314d;
+      border-color: #cbd5e1;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .stat span { display: block; color: #64748b; font-size: 13px; }
+    .stat strong { display: block; font-size: 26px; margin-top: 8px; }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+      gap: 18px;
+    }
+    h2 { font-size: 17px; margin: 0 0 15px; }
+    .muted { color: #64748b; font-size: 13px; }
+    .doc {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 13px 0;
+      border-top: 1px solid #edf1f6;
+    }
+    .doc strong { display: block; overflow-wrap: anywhere; }
+    .doc small { display: block; margin-top: 5px; color: #64748b; }
+    .actions { display: flex; flex-wrap: wrap; gap: 7px; }
+    .actions button { padding: 7px 9px; font-size: 12px; }
+    form { display: grid; gap: 10px; }
+    label { display: grid; gap: 5px; font-size: 13px; color: #475569; }
+    .notice {
+      margin-top: 16px;
+      background: #fff8e6;
+      border: 1px solid #f0d99c;
+      padding: 12px;
+      border-radius: 10px;
+      color: #704d00;
+      font-size: 13px;
+    }
+    #message { margin: 12px 0; min-height: 20px; font-size: 14px; }
+    .audit-row {
+      padding: 10px 0;
+      border-top: 1px solid #edf1f6;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+    .audit-row strong { display: block; }
+    @media(max-width: 760px) {
+      .grid, .stats { grid-template-columns: 1fr; }
+      .toolbar { align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>TrustVault</h1>
+    <p>Secure document sharing with an audit trail</p>
+  </header>
+
+  <main>
+    <section class="toolbar">
+      <div>
+        <label for="userSelect">Demo identity</label>
+        <select id="userSelect">
+          <option value="user-admin">Asha Admin — Acme Finance</option>
+          <option value="user-manager">Ravi Manager — Acme Finance</option>
+          <option value="user-viewer">Maya Viewer — Acme Finance</option>
+          <option value="user-other-company">Noah Admin — Northstar Health</option>
+        </select>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="secondary" id="resetDataBtn">Reset Demo Data</button>
+        <button class="secondary" id="refreshBtn">Refresh dashboard</button>
+      </div>
+    </section>
+
+    <div id="message" role="status"></div>
+
+    <section class="stats">
+      <div class="stat"><span>Visible documents</span><strong id="docCount">0</strong></div>
+      <div class="stat"><span>Organization</span><strong id="orgName" style="font-size: 18px">-</strong></div>
+      <div class="stat"><span>Recent audit events</span><strong id="auditCount">0</strong></div>
+    </section>
+
+    <section class="grid">
+      <div class="panel">
+        <h2>Documents</h2>
+        <div id="documents"><p class="muted">Loading...</p></div>
+        <div class="notice">Demo only: uploads create document metadata. No file bytes are stored.</div>
+      </div>
+
+      <div>
+        <section class="panel">
+          <h2>Add a demo document</h2>
+          <form id="uploadForm">
+            <label>Document name
+              <input id="docName" required maxlength="120" placeholder="Quarterly-report.pdf">
+            </label>
+            <label>Content type
+              <select id="contentType">
+                <option value="application/pdf">PDF</option>
+                <option value="text/plain">Text</option>
+                <option value="application/vnd.openxmlformats-officedocument.wordprocessingml.document">Word document</option>
+              </select>
+            </label>
+            <button type="submit">Add document metadata</button>
+          </form>
+        </section>
+
+        <section class="panel" style="margin-top: 18px;">
+          <h2>Audit trail</h2>
+          <div id="auditLogs"><p class="muted">Loading...</p></div>
+        </section>
+      </div>
+    </section>
+
+    <p class="muted" style="margin-top: 20px;">Client-side prototype hosted on GitHub Pages</p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
